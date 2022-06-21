@@ -11,8 +11,7 @@ from .preprocessing import extract_fbanks
 from .predictions import get_embeddings, get_cosine_distance
 
 app = Flask(__name__)
-session = boto3.Session()
-s3 = session.resource('s3')
+s3 = boto3.client('s3')
 
 DATA_DIR = 'data_files/'
 THRESHOLD = 0.45    # play with this value. you may get better results
@@ -50,6 +49,7 @@ def login(username):
 @app.route('/register/<string:username>', methods=['POST'])
 def register(username):
     filename = _save_file(request, username)
+    _upload_file_to_s3(filename, username)
     fbanks = extract_fbanks(filename)
     embeddings = get_embeddings(fbanks)
     print('shape of embeddings: {}'.format(embeddings.shape), flush=True)
@@ -57,6 +57,15 @@ def register(username):
     np.save(DATA_DIR + username + '/embeddings.npy', mean_embeddings)
     return Response('registered', mimetype='application/json')
 
+def _upload_file_to_s3(filename, username):
+    """
+    Uploads file to S3 bucket using S3 client object
+    :return: None
+    """
+    bucketname = config('S3_BUCKET')
+    objectname = 'audio-samples/'+str(username)+'.wav'
+    response = s3.upload_file(filename, bucketname, objectname)
+    print(response)
 
 def _save_file(request_, username):
     file = request_.files['file']
@@ -67,12 +76,5 @@ def _save_file(request_, username):
     filename = DATA_DIR + username + '/sample.wav'
     file.save(filename)
 
-    result = s3.meta.client.put_object(Body=file, Bucket=config('S3_BUCKET'), Key="audio-samples/"+str(username)+".wav")
-    res = result.get('ResponseMetadata')
-
-    if res.get('HTTPStatusCode') == 200:
-        print('File Uploaded Successfully')
-    else:
-        print('File Not Uploaded')
     return filename
 

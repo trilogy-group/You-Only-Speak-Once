@@ -84,6 +84,5 @@ Make sure that you have AWS Credentials stored at `~/.aws/credentials`.
 
 ```bash
 docker build -t yoso .
-docker run -v ~/.aws/:/root/.aws:ro --env S3_BUCKET='xyz' --rm -p 5000:5000 yoso
+docker run -v ~/.aws/:/root/.aws:ro --env S3_BUCKET='xyz' --rm -p 5000:5000 -p 443:443 -p 80:80 yoso
 ```
-Navigate to http://localhost:5000 and follow instructions
