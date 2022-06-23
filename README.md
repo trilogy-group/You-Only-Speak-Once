@@ -87,6 +87,6 @@ docker build -t yoso .
 docker run -v ~/.aws/:/root/.aws:ro --env S3_BUCKET='xyz' --rm -p 5000:5000 -p 443:443 -p 80:80 yoso
 ```
 
-TO run experiment you need to store the audio sample in audio_sample folder and video sample in video_sample folder 
-first you need to run register.py file to register all user into your server.(update the server link)
-after that you can extract the wav audio file from video sample by using extractaudio.py file and use that audio file to run experiment.py file 
+TO run experiment you need to store the audio sample in audio_sample folder and video sample in video_sample folder. 
+first you need to run register.py file to register all user into your server.(update the server link).
+after that you can extract the wav audio file from video sample by using extractaudio.py file and use that audio file to run experiment.py file.
